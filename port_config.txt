@@ -1,0 +1,31 @@
+ucli
+pm port-del -/-
+pm port-add 6/0 10G none
+pm port-add 6/1 10G none
+pm port-add 11/- 10G none
+pm port-add 13/- 100G rs
+pm port-add 14/- 100G rs
+pm port-add 15/- 40G fc
+pm port-add 16/- 40G fc
+pm port-add 17/- 40G fc
+pm port-add 18/- 40G fc
+pm port-add 21/0 10G none
+pm port-add 21/1 10G none
+pm an-set 6/0 2
+pm an-set 6/1 2
+pm an-set 11/- 1
+pm an-set 13/- 1
+pm an-set 14/- 1
+pm an-set 15/- 1
+pm an-set 16/- 1
+pm an-set 17/- 1
+pm an-set 18/- 1
+pm an-set 21/0 1
+pm an-set 21/1 1
+pm port-enb -/-
+bf_pltfm led
+led-task-cfg -r 1
+..
+..
+exit
+exit
