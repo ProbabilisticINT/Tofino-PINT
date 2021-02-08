@@ -5,10 +5,9 @@ The repository only includes the data plane part of PINT for Tofino, and does no
 
 ## Table of contents
 * [Requirements](#requirements)
+* [Running PINT](#running-pint)
 * [Link configuration](#link-configuration)
-* [Development topology](#development-topology)
-* [Starting Pitcher](#starting-pitcher)
-* [Planned topology](#planned-topology)
+* [Topology](#topology)
 
 
 ## Requirements
