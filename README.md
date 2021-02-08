@@ -12,15 +12,20 @@ The repository only includes the data plane portion of PINT for Tofino, without 
 
 
 ## Requirements
-1. An installed and pre-configured Tofino switch
+This project requires an installed and set up Tofino switch.
+
+During development, a Stordis BF2556X-1T was used with SDE version 8.9.2.
+
+A single switch is used to emulate multiple switching running PINT.
+
+This is achieved by using external loopback, requiring cabling according to the [link configuration section](#link-configuration)
 
 ## Running PINT
-1. Set up a Tofino switch. This project was developed on a Stordis BF2556X-1T running SDE 8.9.2
-2. Compile the [PINT code](p4src/pint.p4)
-3. Start the PINT program on the Tofino
-4. Configure the Tofino ports, which in our case are [these rules](port_config.txt)
-5. Start the switch CPU component using [start_switch_cpu.sh](start_switch_cpu.sh)
-6. Inject packets from the switch CPU using [pktgen.py](pktgen.py)
+1. Compile the [PINT code](p4src/pint.p4)
+2. Start the PINT program on the Tofino
+3. Configure the Tofino ports, which in our case are [these rules](port_config.txt)
+4. Start the switch CPU component using [start_switch_cpu.sh](start_switch_cpu.sh)
+5. Inject packets from the switch CPU using [pktgen.py](pktgen.py)
 
 The injected packets will be processed by PINT, and the controller should print the raw generated output
 
