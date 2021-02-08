@@ -1,7 +1,7 @@
 # Running PINT in the Tofino ASIC
 This repository contains code to run PINT in the Tofino ASIC.
 
-The repository only includes the data plane portion of PINT for Tofino, without showing how to process the generated telemetry digests at the controller
+The repository only includes the data plane part of PINT for Tofino, and does not explain how to process the generated telemetry data at the controller.
 
 ## Table of contents
 * [Requirements](#requirements)
@@ -34,7 +34,7 @@ During development, our Tofino had links connected according to the following im
 ![Tofino link configuration](tofino_current_links.png?raw=true "Tofino link configuration")
 
 ### Topology
-This is the topology used during development of Pitcher:
+This is the topology used during development of PINT on the Tofino:
 
 ![Tofino current topology](tofino_current_topology.png?raw=true "Tofino current topology")
 
