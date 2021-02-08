@@ -240,9 +240,7 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 		size=16;
 	}
 	
-	/*
-	 * Actions can not span stages, so can not write directly to packet here. This is done in Ingress control block
-	 */
+	
 	action static_per_flow_baseline()
 	{
 		hdr.pint.digest = ig_md.value_hash; //Just replace the digest
@@ -309,7 +307,7 @@ control SwitchIngress(inout headers hdr, inout ingress_metadata_t ig_md, in ingr
 	ControlPINT() pint;
 	
 	/*
-	 * These are only required to emulate the topology on single switch
+	 * These are only required for emulating the topology on a single switch
 	 */
 	action set_switch_id(switch_id_t switch_id)
 	{
@@ -352,7 +350,7 @@ control SwitchIngress(inout headers hdr, inout ingress_metadata_t ig_md, in ingr
 	/*
 	 * Detect if sink, based on egress port
 	 * (placed in ingress instead of egress due to bug not allowing digest being sent from egress)
-	 * (therefore does not support PINT for multicast packets to sink)
+	 * (this issue was present in the SDE 8.9.2)
 	 */
 	action set_is_sink()
 	{

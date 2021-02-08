@@ -17,7 +17,6 @@ This project requires an installed and set up Tofino switch.
 During development, a Stordis BF2556X-1T was used with SDE version 8.9.2.
 
 A single switch is used to emulate multiple switching running PINT.
-
 This is achieved by using external loopback, requiring cabling according to the [link configuration section](#link-configuration)
 
 ## Running PINT
