@@ -14,7 +14,7 @@
 
 #define FLOW_ID_BITS 16
 #define CHECKSUM_VERSION_BITS 8
-#define CHECKSUM_INDEX_BITS 32 //should be FLOW_ID_BITS*CHECKSUM_VERSION_BITS
+#define CHECKSUM_INDEX_BITS 32 //should be at least FLOW_ID_BITS+CHECKSUM_VERSION_BITS
 
 /*
  * Specify data types
@@ -207,8 +207,8 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 	}
 	
 	/*
-	 * Tofino limitations. Use this table to check reservoir sampling probability for baseline processing
-	 * (can not compare two variables in Tofino with >/<)
+	 * Check baseline writing probabilities
+	 * Comparing global hash against hop-specific threshold to see if it should write into the baseline-processed digest
 	 */
 	action set_should_write_baseline()
 	{
@@ -241,6 +241,9 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 	}
 	
 	
+	/*
+	 * This table will map pre-calculated conditionals to digest-processing actions
+	 */
 	action static_per_flow_baseline()
 	{
 		hdr.pint.digest = ig_md.value_hash; //Just replace the digest
@@ -249,7 +252,7 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 	{
 		hdr.pint.digest = hdr.pint.digest^ig_md.value_hash; //XOR into the digest
 	}
-	table tbl_doProcessDigest //This table will map pre-calculated conditionals to digest processing actions
+	table tbl_doProcessDigest
 	{
 		key = {
 			ig_md.static_per_flow_doBaseline: exact;
@@ -272,9 +275,8 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 	
 	apply
 	{
-		//Set the value we want to report (which in this case is the switch ID)
+		//Set the value we want to encode (which in this case is the switch ID)
 		ig_md.raw_value = (raw_value_t)ig_md.switch_id;
-		
 		
 		//Prepare hashes
 		ig_md.decider_hash = decider_hash.get({hdr.ipv4.identification}); //Calculate the decider hash
@@ -282,18 +284,17 @@ control ControlPINT(inout headers hdr, inout ingress_metadata_t ig_md, in ingres
 		hashlookup_value.apply(); //Lookup value hash from table (ig_md.value_hash)
 		
 		/*
-		 * Pre-calculate conditionals for PINT (Tofino limitation)
-		 * (for static-per-flow)
+		 * Pre-calculate conditionals for PINT (for static per-flow telemetry)
 		 */
 		if(ig_md.decider_hash < THRESHOLD_STATIC_PER_FLOW_TYPE) //Baseline processing
 		{
-			tbl_check_baseline_probability.apply();
+			tbl_check_baseline_probability.apply(); //Perform additional conditional through M/A table
 		}
 		else //XOR processing 
 		{
 			if(ig_md.global_hash < THRESHOLD_XOR_MODIFY) //If this node should modify XOR digest (fixed probability)
 			{
-				ig_md.static_per_flow_doXOR = 1;
+				ig_md.static_per_flow_doXOR = 1; //The XOR digest will be modified
 			}
 		}
 		
@@ -307,7 +308,7 @@ control SwitchIngress(inout headers hdr, inout ingress_metadata_t ig_md, in ingr
 	ControlPINT() pint;
 	
 	/*
-	 * These are only required for emulating the topology on a single switch
+	 * These are only required for emulating multiple hops on a single switch
 	 */
 	action set_switch_id(switch_id_t switch_id)
 	{
@@ -349,8 +350,6 @@ control SwitchIngress(inout headers hdr, inout ingress_metadata_t ig_md, in ingr
 	
 	/*
 	 * Detect if sink, based on egress port
-	 * (placed in ingress instead of egress due to bug not allowing digest being sent from egress)
-	 * (this issue was present in the SDE 8.9.2)
 	 */
 	action set_is_sink()
 	{
@@ -398,9 +397,10 @@ control SwitchIngress(inout headers hdr, inout ingress_metadata_t ig_md, in ingr
 			{
 				add_pint_header(); //Add the pint header
 			}
-		
+			
 			ig_md.hop_number = (bit<8>)(255 - hdr.ipv4.ttl); //Calculate the hop number
 			
+			//Run PINT on the packet
 			pint.apply(hdr, ig_md, ig_intr_md, ig_intr_prsr_md, ig_intr_dprsr_md, ig_intr_tm_md);
 			
 			/*
