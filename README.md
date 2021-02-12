@@ -1,4 +1,4 @@
-# Running PINT in the Tofino ASIC
+# Running PINT on the Tofino ASIC
 This repository contains code to run PINT in the Tofino ASIC.
 
 The repository only includes the data plane part of PINT for Tofino, and does not explain how to process the generated telemetry data at the controller.
@@ -15,8 +15,8 @@ This project requires an installed and set up Tofino switch.
 
 During development, a Stordis BF2556X-1T was used with SDE version 8.9.2.
 
-A single switch is used to emulate multiple switching running PINT.
-This is achieved by using external loopback, requiring cabling according to the [link configuration section](#link-configuration)
+A single switch is used to emulate multiple switching running PINT.\
+This is achieved through external loopback, requiring cabling according to the [link configuration section](#link-configuration)
 
 ## Running PINT
 1. Compile the [PINT code](p4src/pint.p4)
@@ -32,7 +32,7 @@ During development, our Tofino had links connected according to the following im
 
 ![Tofino link configuration](tofino_current_links.png?raw=true "Tofino link configuration")
 
-### Topology
+## Topology
 This is the topology used during development of PINT on the Tofino:
 
 ![Tofino current topology](tofino_current_topology.png?raw=true "Tofino current topology")
